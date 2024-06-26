@@ -1,14 +1,21 @@
-# Use an official Tomcat image as the base image
-FROM tomcat:latest
+# Use Amazon Linux 2 as the base image
+FROM amazonlinux:2
 
-# Remove the default Tomcat applications
-RUN rm -rf /usr/local/tomcat/webapps/*
+# Update the package repository and install httpd (Apache)
+RUN yum update -y && \
+    yum install -y httpd && \
+    yum clean all
 
-# Copy your WAR file into the Tomcat webapps directory
-COPY /webapp/target/webapp.war /usr/local/tomcat/webapps/
+# Copy custom HTML content to the default web directory
+COPY ./index.html /var/www/html/
 
-# Expose the default Tomcat port
-EXPOSE 8080
+# Set the environment variables
+ENV APACHE_RUN_USER=apache
+ENV APACHE_RUN_GROUP=apache
+ENV APACHE_LOG_DIR=/var/log/httpd
 
-# Start Tomcat
-CMD ["catalina.sh", "run"]
+# Expose port 80
+EXPOSE 80
+
+# Start the Apache HTTP server in the foreground
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
