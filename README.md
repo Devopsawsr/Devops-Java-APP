@@ -1,6 +1,4 @@
-registration-app
-<br>
-Test33
+
 
 
 To install Trivy 
